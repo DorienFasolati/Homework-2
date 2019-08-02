@@ -1,0 +1,83 @@
+Sub MultiStock()
+
+
+Dim ws As Worksheet
+Dim lastrow As Long
+Dim lastcol As Long
+
+For Each ws In ActiveWorkbook.Worksheets
+    ws.Activate
+    lastrow = ws.Cells(Rows.Count, 1).End(xlUp).row
+    lastcol = ws.Cells(1, Columns.Count).End(xlToLeft).Column
+
+Dim Ticker As String
+Dim i As Long
+Dim vol As Double
+Dim open_price As Double
+Dim closing_price As Double
+Dim yearly_change As Double
+Dim percent_change As Double
+Dim start_row As Long
+Dim header_row As Long
+
+vol = 0
+header_row = 1
+start_row = 2
+open_price = Cells(start_row, 3).Value
+percent_start = Cells(start_row, 3).Value
+
+
+ws.Cells(1, lastcol + 2).Value = "Ticker"
+ws.Cells(1, lastcol + 3).Value = "Yearly Change"
+ws.Cells(1, lastcol + 4).Value = "Percent Change"
+ws.Cells(1, lastcol + 5).Value = "Ticker Stock Volume"
+
+For i = 2 To lastrow
+
+If Cells(i + 1, 1).Value <> Cells(i, 1).Value Then
+
+Ticker = Cells(i, 1).Value
+Cells(start_row, lastcol + 2).Value = Ticker
+
+vol = vol + Cells(i, 7).Value
+Cells(start_row, lastcol + 5).Value = vol
+
+closing_price = Cells(i, 6).Value
+
+yearly_change = open_price - closing_price
+Cells(start_row, lastcol + 3).Value = yearly_change
+
+    If (open_price = 0 And closing_price = 0) Then
+        percent_change = 0
+    ElseIf (open_price = 0 And closing_price <> 0) Then
+        percent_change = 1
+    Else
+        percent_change = yearly_change / open_price
+        Cells(start_row, lastcol + 4).Value = Format(percent_change, "percent")
+    End If
+
+start_row = start_row + 1
+vol = 0
+
+Else
+vol = vol + Cells(i + 1, 7).Value
+End If
+Next i
+
+        lastrowYC = ws.Cells(Rows.Count, lastcol + 3).End(xlUp).row
+
+        For j = 2 To lastrowYC
+            If (Cells(j, lastcol + 3).Value > 0 Or Cells(j, lastcol + 3).Value = 0) Then
+                Cells(j, lastcol + 3).Interior.ColorIndex = 10
+            ElseIf Cells(j, lastcol + 3).Value < 0 Then
+                Cells(j, lastcol + 3).Interior.ColorIndex = 3
+            End If
+        Next j
+        
+
+
+Next ws
+
+
+End Sub
+
